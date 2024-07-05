@@ -1,10 +1,16 @@
+export interface ChartData {
+    labels: string[];
+    datasets: {
+        label: string;
+        data: number[];
+    }[];
+}
 export interface SalesData {
-        month: string;
-        sales: number;
-      }
-      
-      export interface ExpenseData {
-        category: string;
-        amount: number;
-      }
-      
+    month: string;
+    sales: number;
+}
+
+export interface ExpenseData {
+    category: string;
+    amount: number;
+}
