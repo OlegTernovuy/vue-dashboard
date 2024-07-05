@@ -1,35 +1,13 @@
 <template>
     <div class="filters">
-        <label v-if="type === 'line'" for="salesFilter">Filter by Sales:</label>
-        <label v-if="type === 'bar'" for="amountFilter"
-            >Filter by Amount:</label
-        >
-        <select
-            v-if="type === 'line'"
-            id="salesFilter"
-            v-model="selectedMaxSales"
-            @change="applyFilter"
-        >
+        <label :for="filterId">{{ filterLabel }}</label>
+        <select :id="filterId" v-model="selectedValue" @change="applyFilter">
             <option
-                v-for="maxSales in maxSalesOptions"
-                :key="maxSales"
-                :value="maxSales"
+                v-for="option in filterOptions"
+                :key="option"
+                :value="option"
             >
-                ≤ {{ maxSales }}
-            </option>
-        </select>
-        <select
-            v-if="type === 'bar'"
-            id="amountFilter"
-            v-model="selectedMaxAmount"
-            @change="applyFilter"
-        >
-            <option
-                v-for="maxAmount in maxAmountOptions"
-                :key="maxAmount"
-                :value="maxAmount"
-            >
-                ≤ {{ maxAmount }}
+                ≤ {{ option }}
             </option>
         </select>
     </div>
@@ -42,6 +20,7 @@ export default {
         type: {
             type: String,
             required: true,
+            validator: (value) => ['line', 'bar'].includes(value),
         },
         data: {
             type: Array,
@@ -50,20 +29,49 @@ export default {
     },
     data() {
         return {
-            selectedMaxSales: null,
-            selectedMaxAmount: null,
-            maxSalesOptions: [150, 180, 200, 230, 250],
-            maxAmountOptions: [500, 1000, 1500, 3000],
+            selectedValue: null,
+            filterId: '',
+            filterLabel: '',
+            filterOptions: [],
         };
+    },
+    computed: {
+        maxSalesOptions() {
+            return [150, 180, 200, 230, 250];
+        },
+        maxAmountOptions() {
+            return [500, 1000, 1500, 3000];
+        },
+    },
+    watch: {
+        type(newType) {
+            if (newType === 'line') {
+                this.filterId = 'salesFilter';
+                this.filterLabel = 'Filter by Sales:';
+                this.filterOptions = this.maxSalesOptions;
+            } else if (newType === 'bar') {
+                this.filterId = 'amountFilter';
+                this.filterLabel = 'Filter by Amount:';
+                this.filterOptions = this.maxAmountOptions;
+            }
+        },
     },
     methods: {
         applyFilter() {
-            if (this.type === 'line') {
-                this.$emit('filter-change', this.selectedMaxSales);
-            } else if (this.type === 'bar') {
-                this.$emit('filter-change', this.selectedMaxAmount);
-            }
+            this.$emit('filter-change', this.selectedValue);
         },
+    },
+    mounted() {
+        // Initialize filter options based on type
+        if (this.type === 'line') {
+            this.filterId = 'salesFilter';
+            this.filterLabel = 'Filter by Sales:';
+            this.filterOptions = this.maxSalesOptions;
+        } else if (this.type === 'bar') {
+            this.filterId = 'amountFilter';
+            this.filterLabel = 'Filter by Amount:';
+            this.filterOptions = this.maxAmountOptions;
+        }
     },
 };
 </script>

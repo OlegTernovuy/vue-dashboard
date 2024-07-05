@@ -22,8 +22,7 @@ import { onMounted } from 'vue';
 
 import ChartFilters from './ChartFilters.vue';
 
-import { useChartData } from '../utils/fetchChartData';
-import { applyChartFilter } from '../utils/applyChartFilter';
+import { useChartData, applyChartFilter } from '../utils/index';
 
 Chart.register(...registerables);
 
