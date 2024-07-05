@@ -1,51 +1,65 @@
 <template>
-    <p v-if="loadingState">Loading...</p>
-    <BarChart :chartData="data" :options="options" v-else />
+    <div>
+        <p v-if="loadingState">Loading...</p>
+        <div v-else>
+            <BarChart
+                :chartData="filteredChartData || defaultChartData"
+                :options="options"
+            />
+            <ChartFilters
+                type="bar"
+                :data="expenseData"
+                @filter-change="handleFilterChange"
+            />
+        </div>
+    </div>
 </template>
 
 <script lang="ts">
 import { Chart, registerables } from 'chart.js';
 import { BarChart } from 'vue-chart-3';
-import { ref, onMounted } from 'vue';
+import { onMounted } from 'vue';
 
-import { ChartData, ExpenseData } from '../types';
-import api from '../api/chartApi';
+import ChartFilters from './ChartFilters.vue';
+
+import { useChartData } from '../utils/fetchChartData';
+import { applyChartFilter } from '../utils/applyChartFilter';
 
 Chart.register(...registerables);
 
 export default {
     name: 'ExpensesBarChart',
-    components: { BarChart },
+    components: { BarChart, ChartFilters },
     setup() {
-        const loadingState = ref(true);
-        const data = ref<ChartData | null>(null);
-        const options = {
-            responsive: true,
-            maintainAspectRatio: false,
+        const {
+            loadingState,
+            data,
+            defaultChartData,
+            filteredChartData,
+            fetchData,
+        } = useChartData('expenses');
+
+        onMounted(fetchData);
+
+        const handleFilterChange = (maxAmount: number | null) => {
+            filteredChartData.value = applyChartFilter(
+                data.value,
+                maxAmount,
+                'expenses',
+                defaultChartData
+            );
         };
 
-        onMounted(async () => {
-            try {
-                const expenseData: ExpenseData[] = await api.getExpenseData();
-                data.value = {
-                    labels: expenseData.map((item) => item.category),
-                    datasets: [
-                        {
-                            label: 'Sales',
-                            data: expenseData.map((item) => item.amount),
-                        },
-                    ],
-                };
-                loadingState.value = false;
-            } catch (error) {
-                console.error('Failed to fetch expense data:', error);
-                loadingState.value = false;
-            }
-        });
-
-        return { data, options, loadingState };
+        return {
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+            },
+            loadingState,
+            expenseData: data,
+            filteredChartData,
+            handleFilterChange,
+        };
     },
 };
 </script>
-
-<style></style>

@@ -1,25 +1,51 @@
 <template>
-    <div class="dashboard">
-        <SalesLineChart />
-        <ExpensesBarChart />
+    <DashboardHeader />
+    <div class="container-fluid">
+        <div class="row">
+            <div
+                class="col-lg-6 col-md-12 mb-3"
+                v-for="chart in charts"
+                :key="chart.title"
+            >
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ chart.title }}</h5>
+                        <component :is="chart.component" />
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import DashboardHeader from './DashboardHeader.vue';
 import SalesLineChart from './LineChart.vue';
 import ExpensesBarChart from './BarChart.vue';
 
 export default defineComponent({
     name: 'Dashboard',
-    components: { SalesLineChart, ExpensesBarChart },
+    components: {
+        DashboardHeader,
+        SalesLineChart,
+        ExpensesBarChart,
+    },
+    setup() {
+        const charts = [
+            {
+                title: 'Sales Line Chart',
+                component: 'SalesLineChart',
+            },
+            {
+                title: 'Expenses Bar Chart',
+                component: 'ExpensesBarChart',
+            },
+        ];
+
+        return {
+            charts,
+        };
+    },
 });
 </script>
-
-<style scoped>
-.dashboard {
-    display: flex;
-    flex-direction: row;
-
-}
-</style>

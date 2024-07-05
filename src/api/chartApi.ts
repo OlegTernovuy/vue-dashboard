@@ -1,14 +1,6 @@
 import axios from 'axios';
 
-export interface SalesData {
-    month: string;
-    sales: number;
-}
-
-export interface ExpenseData {
-    category: string;
-    amount: number;
-}
+import { ExpenseData, SalesData } from '../types';
 
 const apiClient = axios.create({
     baseURL: 'http://demo2663713.mockable.io/',
