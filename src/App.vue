@@ -2,7 +2,7 @@
     <Dashboard />
 </template>
 
-<script>
+<script lang="ts">
 import { Dashboard } from './components/index';
 
 export default {

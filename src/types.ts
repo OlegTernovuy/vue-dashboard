@@ -10,6 +10,7 @@ export interface SalesData {
     sales: number;
 }
 
+export type ChartDataType = SalesData[] | ExpenseData[];
 export interface ExpenseData {
     category: string;
     amount: number;

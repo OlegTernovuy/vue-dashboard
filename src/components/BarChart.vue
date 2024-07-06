@@ -2,10 +2,7 @@
     <div>
         <p v-if="loadingState">Loading...</p>
         <div v-else>
-            <BarChart
-                :chartData="filteredChartData || defaultChartData"
-                :options="options"
-            />
+            <BarChart :chartData="filteredChartData" :options="options" />
             <ChartFilters
                 type="bar"
                 :data="expenseData"
@@ -20,7 +17,7 @@ import { Chart, registerables } from 'chart.js';
 import { BarChart } from 'vue-chart-3';
 import { onMounted } from 'vue';
 
-import ChartFilters from './ChartFilters.vue';
+import { ChartFilters } from './index';
 
 import { useChartData, applyChartFilter } from '../utils/index';
 

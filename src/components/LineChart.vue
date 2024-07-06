@@ -2,10 +2,7 @@
     <div>
         <p v-if="loadingState">Loading...</p>
         <div v-else>
-            <LineChart
-                :chartData="filteredChartData || defaultChartData"
-                :options="options"
-            />
+            <LineChart :chartData="filteredChartData" :options="options" />
             <ChartFilters
                 type="line"
                 :data="salesData"
@@ -20,7 +17,7 @@ import { Chart, registerables } from 'chart.js';
 import { LineChart } from 'vue-chart-3';
 import { onMounted } from 'vue';
 
-import ChartFilters from './ChartFilters.vue';
+import { ChartFilters } from './index';
 
 import { useChartData, applyChartFilter } from '../utils/index';
 

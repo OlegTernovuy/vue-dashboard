@@ -1,13 +1,11 @@
 import { ref } from 'vue';
-import { ChartData, SalesData, ExpenseData } from '../types';
+
+import { ChartDataType, SalesData, ExpenseData, ChartData } from '../types';
 import api from '../api/chartApi';
 
-type ChartDataType = SalesData[] | ExpenseData[];
-
-export const useChartData = (type: 'sales' | 'expenses') => {
+export function useChartData(type: 'sales' | 'expenses') {
     const loadingState = ref(true);
     const data = ref<ChartDataType>([]);
-
     const defaultChartData: ChartData = {
         labels: [],
         datasets: [
@@ -17,33 +15,33 @@ export const useChartData = (type: 'sales' | 'expenses') => {
             },
         ],
     };
-
-    const filteredChartData = ref<ChartData | null>(null);
+    const filteredChartData = ref<ChartData>(defaultChartData);
 
     const fetchData = async () => {
         try {
             if (type === 'sales') {
-                data.value = await api.getSalesData();
+                const response = await api.getSalesData();
+                data.value = response as SalesData[];
+                defaultChartData.labels = (data.value as SalesData[]).map(
+                    (item) => item.month
+                );
+                defaultChartData.datasets[0].data = (
+                    data.value as SalesData[]
+                ).map((item) => item.sales);
             } else {
-                data.value = await api.getExpenseData();
+                const response = await api.getExpenseData();
+                data.value = response as ExpenseData[];
+                defaultChartData.labels = (data.value as ExpenseData[]).map(
+                    (item) => item.category
+                );
+                defaultChartData.datasets[0].data = (
+                    data.value as ExpenseData[]
+                ).map((item) => item.amount);
             }
-
-            defaultChartData.labels = data.value.map((item) =>
-                type === 'sales'
-                    ? (item as SalesData).month
-                    : (item as ExpenseData).category
-            );
-
-            defaultChartData.datasets[0].data = data.value.map((item) =>
-                type === 'sales'
-                    ? (item as SalesData).sales
-                    : (item as ExpenseData).amount
-            );
-
             filteredChartData.value = { ...defaultChartData };
             loadingState.value = false;
         } catch (error) {
-            console.error(`Failed to fetch ${type} data:`, error);
+            console.error('Failed to fetch data:', error);
             loadingState.value = false;
         }
     };
@@ -51,8 +49,8 @@ export const useChartData = (type: 'sales' | 'expenses') => {
     return {
         loadingState,
         data,
-        defaultChartData,
         filteredChartData,
+        defaultChartData,
         fetchData,
     };
-};
+}

@@ -1,6 +1,4 @@
-import { ChartData, SalesData, ExpenseData } from '../types';
-
-type ChartDataType = SalesData[] | ExpenseData[];
+import { ChartDataType, ChartData, SalesData, ExpenseData } from '../types';
 
 export const applyChartFilter = (
     data: ChartDataType,

@@ -21,7 +21,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 
-import { SalesLineChart, ExpensesBarChart, DashboardHeader } from './index';
+import { DashboardHeader, SalesLineChart, ExpensesBarChart } from './index';
 
 export default defineComponent({
     name: 'Dashboard',

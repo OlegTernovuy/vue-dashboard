@@ -13,65 +13,58 @@
     </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent, ref, watch, computed } from 'vue';
+
+export default defineComponent({
     name: 'ChartFilters',
     props: {
         type: {
             type: String,
             required: true,
-            validator: (value) => ['line', 'bar'].includes(value),
+            validator: (value: string) => ['line', 'bar'].includes(value),
         },
         data: {
             type: Array,
             required: true,
         },
     },
-    data() {
+    setup(props, { emit }) {
+        const selectedValue = ref<number | null>(null);
+        const filterId = ref<string>('');
+        const filterLabel = ref<string>('');
+        const filterOptions = ref<number[]>([]);
+
+        const maxSalesOptions = computed(() => [150, 180, 200, 230, 250]);
+        const maxAmountOptions = computed(() => [500, 1000, 1500, 3000]);
+
+        const applyFilter = () => {
+            emit('filter-change', selectedValue.value);
+        };
+
+        watch(
+            () => props.type,
+            (newType) => {
+                if (newType === 'line') {
+                    filterId.value = 'salesFilter';
+                    filterLabel.value = 'Filter by Sales:';
+                    filterOptions.value = maxSalesOptions.value;
+                } else if (newType === 'bar') {
+                    filterId.value = 'amountFilter';
+                    filterLabel.value = 'Filter by Amount:';
+                    filterOptions.value = maxAmountOptions.value;
+                }
+            },
+            { immediate: true }
+        );
+
         return {
-            selectedValue: null,
-            filterId: '',
-            filterLabel: '',
-            filterOptions: [],
+            selectedValue,
+            filterId,
+            filterLabel,
+            filterOptions,
+            applyFilter,
         };
     },
-    computed: {
-        maxSalesOptions() {
-            return [150, 180, 200, 230, 250];
-        },
-        maxAmountOptions() {
-            return [500, 1000, 1500, 3000];
-        },
-    },
-    watch: {
-        type(newType) {
-            if (newType === 'line') {
-                this.filterId = 'salesFilter';
-                this.filterLabel = 'Filter by Sales:';
-                this.filterOptions = this.maxSalesOptions;
-            } else if (newType === 'bar') {
-                this.filterId = 'amountFilter';
-                this.filterLabel = 'Filter by Amount:';
-                this.filterOptions = this.maxAmountOptions;
-            }
-        },
-    },
-    methods: {
-        applyFilter() {
-            this.$emit('filter-change', this.selectedValue);
-        },
-    },
-    mounted() {
-        // Initialize filter options based on type
-        if (this.type === 'line') {
-            this.filterId = 'salesFilter';
-            this.filterLabel = 'Filter by Sales:';
-            this.filterOptions = this.maxSalesOptions;
-        } else if (this.type === 'bar') {
-            this.filterId = 'amountFilter';
-            this.filterLabel = 'Filter by Amount:';
-            this.filterOptions = this.maxAmountOptions;
-        }
-    },
-};
+});
 </script>
