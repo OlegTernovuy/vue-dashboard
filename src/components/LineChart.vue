@@ -13,37 +13,30 @@
 </template>
 
 <script lang="ts">
-import { Chart, registerables } from 'chart.js';
+import { defineComponent, computed } from 'vue';
 import { LineChart } from 'vue-chart-3';
-import { onMounted } from 'vue';
+import { useStore } from 'vuex';
 
 import { ChartFilters } from './index';
 
-import { useChartData, applyChartFilter } from '../utils/index';
-
-Chart.register(...registerables);
-
-export default {
+export default defineComponent({
     name: 'SalesLineChart',
     components: { LineChart, ChartFilters },
     setup() {
-        const {
-            loadingState,
-            data,
-            defaultChartData,
-            filteredChartData,
-            fetchData,
-        } = useChartData('sales');
+        const store = useStore();
 
-        onMounted(fetchData);
+        const loadingState = computed(
+            () => store.getters['chartData/isLoading']
+        );
+        const salesData = computed(() => store.state.chartData.salesData);
+        const filteredChartData = computed(
+            () => store.getters['chartData/salesChartData']
+        );
+
+        store.dispatch('chartData/fetchSalesData');
 
         const handleFilterChange = (maxSales: number | null) => {
-            filteredChartData.value = applyChartFilter(
-                data.value,
-                maxSales,
-                'sales',
-                defaultChartData
-            );
+            store.dispatch('chartData/applySalesFilter', maxSales);
         };
 
         return {
@@ -52,10 +45,10 @@ export default {
                 maintainAspectRatio: false,
             },
             loadingState,
-            salesData: data,
+            salesData,
             filteredChartData,
             handleFilterChange,
         };
     },
-};
+});
 </script>
