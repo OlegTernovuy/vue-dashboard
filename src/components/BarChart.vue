@@ -14,36 +14,32 @@
 
 <script lang="ts">
 import { Chart, registerables } from 'chart.js';
+import { defineComponent, computed } from 'vue';
 import { BarChart } from 'vue-chart-3';
-import { onMounted } from 'vue';
+import { useStore } from 'vuex';
 
 import { ChartFilters } from './index';
 
-import { useChartData, applyChartFilter } from '../utils/index';
-
 Chart.register(...registerables);
 
-export default {
+export default defineComponent({
     name: 'ExpensesBarChart',
     components: { BarChart, ChartFilters },
     setup() {
-        const {
-            loadingState,
-            data,
-            defaultChartData,
-            filteredChartData,
-            fetchData,
-        } = useChartData('expenses');
+        const store = useStore();
 
-        onMounted(fetchData);
+        const loadingState = computed(
+            () => store.getters['chartData/isLoading']
+        );
+        const expenseData = computed(() => store.state.chartData.expensesData);
+        const filteredChartData = computed(
+            () => store.getters['chartData/expensesChartData']
+        );
+
+        store.dispatch('chartData/fetchExpensesData');
 
         const handleFilterChange = (maxAmount: number | null) => {
-            filteredChartData.value = applyChartFilter(
-                data.value,
-                maxAmount,
-                'expenses',
-                defaultChartData
-            );
+            store.dispatch('chartData/applyExpensesFilter', maxAmount);
         };
 
         return {
@@ -52,10 +48,10 @@ export default {
                 maintainAspectRatio: false,
             },
             loadingState,
-            expenseData: data,
+            expenseData,
             filteredChartData,
             handleFilterChange,
         };
     },
-};
+});
 </script>
